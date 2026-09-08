@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Your Shop - Shopy Easy</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        Shopy Easy
+    </div>
+
+    <a href="index.html" class="back-home">
+        ← Back to Home
+    </a>
+
+</header>
+
+
+<section class="form-section">
+
+    <div class="form-box">
+
+        <h1>Create Your Digital Shop</h1>
+
+        <p>
+            Add your shop information, photos, menu and location.
+        </p>
+
+
+        <form id="shopForm">
+
+            <!-- SHOP INFORMATION -->
+
+            <h2>Shop Information</h2>
+
+            <label>Shop Name</label>
+
+            <input
+                type="text"
+                id="shopName"
+                placeholder="Example: Rahul Cafe"
+                required
+            >
+
+
+            <label>Owner Name</label>
+
+            <input
+                type="text"
+                id="ownerName"
+                placeholder="Enter owner name"
+                required
+            >
+
+
+            <label>Mobile Number</label>
+
+            <input
+                type="tel"
+                id="mobile"
+                placeholder="Enter mobile number"
+                required
+            >
+
+
+            <label>Shop Category</label>
+
+            <select id="category" required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option>Restaurant</option>
+                <option>Cafe</option>
+                <option>Clothing Shop</option>
+                <option>Grocery Store</option>
+                <option>Mobile Shop</option>
+                <option>Salon</option>
+                <option>Other</option>
+
+            </select>
+
+
+            <!-- ADDRESS -->
+
+            <h2>Shop Location</h2>
+
+            <label>Shop Address</label>
+
+            <textarea
+                id="address"
+                placeholder="Enter complete shop address"
+                rows="4"
+                required
+            ></textarea>
+
+
+            <label>Google Maps Link</label>
+
+            <input
+                type="url"
+                id="maps"
+                placeholder="Paste Google Maps link"
+            >
+
+
+            <!-- TIMING -->
+
+            <h2>Shop Timing</h2>
+
+            <label>Opening Time</label>
+
+            <input
+                type="time"
+                id="openingTime"
+            >
+
+
+            <label>Closing Time</label>
+
+            <input
+                type="time"
+                id="closingTime"
+            >
+
+
+            <!-- FACILITIES -->
+
+            <h2>Shop Facilities</h2>
+
+            <div class="facilities">
+
+                <label>
+                    <input type="checkbox" value="WiFi">
+                    WiFi
+                </label>
+
+                <label>
+                    <input type="checkbox" value="Parking">
+                    Parking
+                </label>
+
+                <label>
+                    <input type="checkbox" value="Home Delivery">
+                    Home Delivery
+                </label>
+
+                <label>
+                    <input type="checkbox" value="Online Payment">
+                    Online Payment
+                </label>
+
+                <label>
+                    <input type="checkbox" value="AC">
+                    AC
+                </label>
+
+                <label>
+                    <input type="checkbox" value="UPI">
+                    UPI Payment
+                </label>
+
+            </div>
+
+
+            <!-- PHOTOS -->
+
+            <h2>Shop Photos</h2>
+
+            <p class="upload-info">
+                Add photos of your shop, products, menu card,
+                visiting card and other useful images.
+            </p>
+
+
+            <label>Shop / Store Photos</label>
+
+            <input
+                type="file"
+                id="shopPhotos"
+                accept="image/*"
+                multiple
+            >
+
+
+            <label>Menu Card Photos</label>
+
+            <input
+                type="file"
+                id="menuPhotos"
+                accept="image/*"
+                multiple
+            >
+
+
+            <label>Visiting Card</label>
+
+            <input
+                type="file"
+                id="visitingCard"
+                accept="image/*"
+                multiple
+            >
+
+
+            <label>Other Photos</label>
+
+            <input
+                type="file"
+                id="otherPhotos"
+                accept="image/*"
+                multiple
+            >
+
+
+            <!-- CREATE -->
+
+            <button
+                type="submit"
+                class="primary-btn create-btn"
+            >
+                Create My Shop
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
