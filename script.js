@@ -197,7 +197,7 @@ if (googleLoginBtn) {
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: window.location.origin + "/index.html"
+               redirectTo: window.location.origin + "/shopy-easy/index.html"
             }
         });
 
