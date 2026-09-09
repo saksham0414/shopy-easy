@@ -242,7 +242,9 @@ if (!savedShop) {
     // =================================
 
     const currentURL =
-        window.location.href;
+    "https://shopy-easy-five.vercel.app" +
+    window.location.pathname +
+    window.location.search;
 
 
     const qrURL =
