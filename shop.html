@@ -1,317 +1,667 @@
-<!DOCTYPE html>
-<html lang="en">
+// ==========================================
+// SHOPY EASY - SCRIPT.JS
+// LOGIN + SECURE SHOP CREATION
+// ==========================================
 
-<head>
 
-    <meta charset="UTF-8">
+// ==========================================
+// GOOGLE LOGIN
+// ==========================================
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+const googleLoginBtn = document.getElementById("googleLoginBtn");
 
-    <title>Digital Shop</title>
+if (googleLoginBtn) {
 
-    <link rel="stylesheet" href="style.css">
+    googleLoginBtn.addEventListener("click", async function () {
 
-</head>
+        try {
 
+            const { error } =
+                await supabaseClient.auth.signInWithOAuth({
+                    provider: "google",
 
-<body>
+                    options: {
+                        redirectTo:
+                            window.location.origin +
+                            "/shopy-easy/index.html"
+                    }
+                });
 
-<main class="digital-shop">
+            if (error) {
+                console.error(error);
+                alert("Google Login failed:\n\n" + error.message);
+            }
 
+        } catch (error) {
 
-    <!-- SHOP HERO -->
+            console.error(error);
 
-    <section class="shop-hero">
+            alert(
+                "Google Login Error:\n\n" +
+                error.message
+            );
+        }
 
-        <div class="shop-hero-content">
+    });
 
-            <p id="shopCategory" class="shop-category">
-                SHOP
-            </p>
+}
 
-            <h1 id="shopName">
-                My Shop
-            </h1>
 
-            <p id="shopOwner">
-                Welcome to our shop
-            </p>
+// ==========================================
+// CHECK LOGIN
+// ==========================================
 
-        </div>
+async function checkLogin() {
 
-    </section>
+    try {
 
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.getUser();
 
+        if (error) {
+            console.error("Login check error:", error);
+            return;
+        }
 
-    <!-- SHOP PHOTOS -->
+        if (data && data.user) {
 
-    <section class="shop-section">
+            const loginBtn =
+                document.getElementById("googleLoginBtn");
 
-        <div class="section-heading">
+            if (loginBtn) {
 
-            <span>01</span>
+                const user = data.user;
 
-            <h2>Shop Gallery</h2>
+                const userName =
+                    user.user_metadata?.full_name ||
+                    user.user_metadata?.name ||
+                    user.email?.split("@")[0] ||
+                    "User";
 
-            <p>
-                Explore our shop
-            </p>
+                loginBtn.textContent = userName;
+            }
 
-        </div>
+            console.log("Logged in user:", data.user);
+        }
 
+    } catch (error) {
 
-        <div
-            id="shopPhotoGrid"
-            class="modern-gallery"
-        ></div>
+        console.error("Login check failed:", error);
+    }
+}
 
-    </section>
+checkLogin();
 
 
+// ==========================================
+// CREATE SHOP
+// ==========================================
 
-    <!-- ABOUT -->
+const shopForm =
+    document.getElementById("shopForm");
 
-    <section class="shop-section">
+if (shopForm) {
 
-        <div class="section-heading">
+    shopForm.addEventListener(
+        "submit",
+        async function (event) {
 
-            <span>02</span>
+            event.preventDefault();
+            event.stopPropagation();
 
-            <h2>About The Shop</h2>
+            console.log("CREATE SHOP BUTTON CLICKED");
 
-        </div>
+            const createButton =
+                document.querySelector(".create-btn");
 
 
-        <div class="information-card">
+            // ==================================
+            // BUTTON LOADING
+            // ==================================
 
-            <div class="info-item">
+            if (createButton) {
 
-                <div class="info-icon">
-                    📍
-                </div>
+                createButton.disabled = true;
 
-                <div>
+                createButton.textContent =
+                    "Creating Shop...";
+            }
 
-                    <strong>Address</strong>
 
-                    <p id="shopAddress">
-                        Not available
-                    </p>
+            try {
 
-                </div>
+                // ==================================
+                // 1. CHECK SUPABASE
+                // ==================================
 
-            </div>
+                if (
+                    typeof supabaseClient ===
+                    "undefined"
+                ) {
 
+                    throw new Error(
+                        "Supabase is not loaded."
+                    );
+                }
 
-            <div class="info-item">
 
-                <div class="info-icon">
-                    📞
-                </div>
+                // ==================================
+                // 2. CHECK LOGIN
+                // ==================================
 
-                <div>
+                console.log("Checking login...");
 
-                    <strong>Contact</strong>
+                const {
+                    data: userData,
+                    error: userError
+                } =
+                    await supabaseClient.auth.getUser();
 
-                    <p id="shopMobile">
-                        Not available
-                    </p>
+                if (userError) {
 
-                </div>
+                    throw new Error(
+                        "Login check failed: " +
+                        userError.message
+                    );
+                }
 
-            </div>
+                const user =
+                    userData?.user;
 
+                if (!user) {
 
-            <div class="info-item">
+                    alert(
+                        "Please login with Google first."
+                    );
 
-                <div class="info-icon">
-                    🕐
-                </div>
+                    window.location.href =
+                        "index.html";
 
-                <div>
+                    return;
+                }
 
-                    <strong>Opening Hours</strong>
 
-                    <p id="shopTiming">
-                        Not available
-                    </p>
+                console.log(
+                    "Logged in:",
+                    user.email
+                );
 
-                </div>
 
-            </div>
+                // ==================================
+                // 3. CHECK USER ROLE
+                // ==================================
 
-        </div>
+                console.log("Checking user role...");
 
-    </section>
+                const {
+                    data: profile,
+                    error: profileError
+                } =
+                    await supabaseClient
+                        .from("profiles")
+                        .select("role")
+                        .eq("id", user.id)
+                        .single();
 
+                if (profileError) {
 
+                    throw new Error(
+                        "Profile check failed: " +
+                        profileError.message
+                    );
+                }
 
-    <!-- FACILITIES -->
+                if (
+                    !profile ||
+                    !["member", "admin"]
+                        .includes(profile.role)
+                ) {
 
-    <section class="shop-section">
+                    alert(
+                        "Access Denied!\n\n" +
+                        "Only Admin and Member accounts " +
+                        "can create a shop."
+                    );
 
-        <div class="section-heading">
+                    return;
+                }
 
-            <span>03</span>
 
-            <h2>Facilities</h2>
+                console.log(
+                    "Role:",
+                    profile.role
+                );
 
-        </div>
 
+                // ==================================
+                // 4. GET FORM DATA
+                // ==================================
 
-        <div
-            id="facilitiesList"
-            class="facility-list"
-        ></div>
+                const shopName =
+                    document
+                        .getElementById("shopName")
+                        .value
+                        .trim();
 
-    </section>
+                const ownerName =
+                    document
+                        .getElementById("ownerName")
+                        .value
+                        .trim();
 
+                const mobile =
+                    document
+                        .getElementById("mobile")
+                        .value
+                        .trim();
 
+                const category =
+                    document
+                        .getElementById("category")
+                        .value;
 
-    <!-- MENU CARD -->
+                const address =
+                    document
+                        .getElementById("address")
+                        .value
+                        .trim();
 
-    <section class="shop-section">
+                const maps =
+                    document
+                        .getElementById("maps")
+                        .value
+                        .trim();
 
-        <div class="section-heading">
+                const openingTime =
+                    document
+                        .getElementById("openingTime")
+                        .value;
 
-            <span>04</span>
+                const closingTime =
+                    document
+                        .getElementById("closingTime")
+                        .value;
 
-            <h2>Menu Card</h2>
 
-            <p>
-                View our menu
-            </p>
+                if (!shopName) {
 
-        </div>
+                    throw new Error(
+                        "Please enter shop name."
+                    );
+                }
 
 
-        <div
-            id="menuPhotoGrid"
-            class="document-gallery"
-        ></div>
+                // ==================================
+                // 5. CREATE UNIQUE SLUG
+                // ==================================
 
-    </section>
+                let shopSlug =
+                    shopName
+                        .toLowerCase()
+                        .trim()
+                        .replace(
+                            /[^a-z0-9]+/g,
+                            "-"
+                        )
+                        .replace(
+                            /^-+|-+$/g,
+                            ""
+                        );
 
 
+                if (!shopSlug) {
 
-    <!-- VISITING CARD -->
+                    throw new Error(
+                        "Invalid shop name."
+                    );
+                }
 
-    <section class="shop-section">
 
-        <div class="section-heading">
+                shopSlug =
+                    shopSlug +
+                    "-" +
+                    Date.now();
 
-            <span>05</span>
 
-            <h2>Visiting Card</h2>
+                console.log(
+                    "Shop slug:",
+                    shopSlug
+                );
 
-        </div>
 
+                // ==================================
+                // 6. GET FACILITIES
+                // ==================================
 
-        <div
-            id="visitingCardGrid"
-            class="document-gallery"
-        ></div>
+                const facilities = [];
 
-    </section>
+                document
+                    .querySelectorAll(
+                        ".facilities input:checked"
+                    )
+                    .forEach(function (item) {
 
+                        facilities.push(
+                            item.value
+                        );
+                    });
 
 
-    <!-- OTHER PHOTOS -->
+                // ==================================
+                // 7. UPLOAD FILES
+                // ==================================
 
-    <section class="shop-section">
+                async function uploadFiles(
+                    inputId,
+                    folderName
+                ) {
 
-        <div class="section-heading">
+                    const input =
+                        document.getElementById(
+                            inputId
+                        );
 
-            <span>06</span>
+                    if (
+                        !input ||
+                        !input.files ||
+                        input.files.length === 0
+                    ) {
 
-            <h2>More Photos</h2>
+                        return [];
+                    }
 
-        </div>
 
+                    const uploadedImages = [];
 
-        <div
-            id="otherPhotoGrid"
-            class="modern-gallery"
-        ></div>
 
-    </section>
+                    for (
+                        let i = 0;
+                        i < input.files.length;
+                        i++
+                    ) {
 
+                        const file =
+                            input.files[i];
 
 
-    <!-- LOCATION -->
+                        console.log(
+                            "Uploading:",
+                            file.name
+                        );
 
-    <section class="location-section">
 
-        <div>
+                        if (createButton) {
 
-            <p class="location-small">
-                VISIT US
-            </p>
+                            createButton.textContent =
+                                "Uploading " +
+                                folderName +
+                                " (" +
+                                (i + 1) +
+                                "/" +
+                                input.files.length +
+                                ")...";
+                        }
 
-            <h2>
-                Find Us On Map
-            </h2>
 
-            <p id="locationText">
-                Location not added.
-            </p>
+                        const safeFileName =
+                            file.name
+                                .replace(
+                                    /[^a-zA-Z0-9._-]/g,
+                                    "_"
+                                );
 
-            <a
-                id="mapsButton"
-                href="#"
-                target="_blank"
-                class="maps-button"
-            >
-                📍 Open Google Maps
-            </a>
 
-        </div>
+                        const filePath =
+                            user.id +
+                            "/" +
+                            shopSlug +
+                            "/" +
+                            folderName +
+                            "/" +
+                            Date.now() +
+                            "-" +
+                            i +
+                            "-" +
+                            safeFileName;
 
-    </section>
 
+                        const {
+                            error: uploadError
+                        } =
+                            await supabaseClient
+                                .storage
+                                .from("shop-images")
+                                .upload(
+                                    filePath,
+                                    file
+                                );
 
 
-    <!-- QR -->
+                        if (uploadError) {
 
-    <section class="qr-section">
+                            throw new Error(
+                                "Photo upload failed:\n" +
+                                file.name +
+                                "\n\n" +
+                                uploadError.message
+                            );
+                        }
 
-        <h2>
-            Shop QR Code
-        </h2>
 
-        <p>
-            Scan this QR code to open this digital shop.
-        </p>
+                        const {
+                            data: publicData
+                        } =
+                            supabaseClient
+                                .storage
+                                .from("shop-images")
+                                .getPublicUrl(
+                                    filePath
+                                );
 
 
-        <div class="qr-box">
+                        uploadedImages.push({
 
-            <img
-                id="qrCode"
-                src=""
-                alt="Shop QR Code"
-            >
+                            name:
+                                file.name,
 
-        </div>
+                            path:
+                                filePath,
 
+                            url:
+                                publicData.publicUrl
+                        });
+                    }
 
-        <button
-            class="primary-btn"
-            onclick="downloadQR()"
-        >
-            Download QR Code
-        </button>
 
-    </section>
+                    return uploadedImages;
+                }
 
 
-</main>
+                // ==================================
+                // 8. UPLOAD SHOP PHOTOS
+                // ==================================
 
+                const shopPhotos =
+                    await uploadFiles(
+                        "shopPhotos",
+                        "shop"
+                    );
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="shop.js"></script>
 
-</body>
+                // ==================================
+                // 9. UPLOAD MENU PHOTOS
+                // ==================================
 
-</html>
+                const menuPhotos =
+                    await uploadFiles(
+                        "menuPhotos",
+                        "menu"
+                    );
+
+
+                // ==================================
+                // 10. UPLOAD VISITING CARD
+                // ==================================
+
+                const visitingCard =
+                    await uploadFiles(
+                        "visitingCard",
+                        "visiting-card"
+                    );
+
+
+                // ==================================
+                // 11. UPLOAD OTHER PHOTOS
+                // ==================================
+
+                const otherPhotos =
+                    await uploadFiles(
+                        "otherPhotos",
+                        "other"
+                    );
+
+
+                // ==================================
+                // 12. SAVE SHOP TO DATABASE
+                // ==================================
+
+                if (createButton) {
+
+                    createButton.textContent =
+                        "Saving Shop...";
+                }
+
+
+                console.log(
+                    "Saving shop to database..."
+                );
+
+
+                const {
+                    error: shopError
+                } =
+                    await supabaseClient
+                        .from("shops")
+                        .insert([{
+
+                            owner_id:
+                                user.id,
+
+                            name:
+                                shopName,
+
+                            slug:
+                                shopSlug,
+
+                            owner_name:
+                                ownerName,
+
+                            mobile:
+                                mobile,
+
+                            category:
+                                category,
+
+                            address:
+                                address,
+
+                            maps:
+                                maps,
+
+                            opening_time:
+                                openingTime ||
+                                null,
+
+                            closing_time:
+                                closingTime ||
+                                null,
+
+                            facilities:
+                                facilities,
+
+                            shop_photos:
+                                shopPhotos,
+
+                            menu_photos:
+                                menuPhotos,
+
+                            visiting_card:
+                                visitingCard,
+
+                            other_photos:
+                                otherPhotos,
+
+                            published:
+                                true
+                        }]);
+
+
+                if (shopError) {
+
+                    throw new Error(
+                        "Database error:\n\n" +
+                        shopError.message
+                    );
+                }
+
+
+                // ==================================
+                // 13. SUCCESS
+                // ==================================
+
+                console.log(
+                    "SHOP CREATED SUCCESSFULLY"
+                );
+
+
+                alert(
+                    "🎉 Shop created successfully!"
+                );
+
+
+                // ==================================
+                // 14. OPEN PUBLIC SHOP
+                // ==================================
+
+                window.location.href =
+                    "shop.html?shop=" +
+                    encodeURIComponent(
+                        shopSlug
+                    );
+
+            }
+
+
+            // ==================================
+            // ERROR HANDLING
+            // ==================================
+
+            catch (error) {
+
+                console.error(
+                    "CREATE SHOP ERROR:",
+                    error
+                );
+
+
+                alert(
+                    "❌ Shop creation failed\n\n" +
+                    error.message
+                );
+
+
+                if (createButton) {
+
+                    createButton.disabled =
+                        false;
+
+                    createButton.textContent =
+                        "Create My Shop";
+                }
+            }
+
+        }
+    );
+}
