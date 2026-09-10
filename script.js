@@ -1,129 +1,143 @@
-```javascript
-// ==========================================
-// SHOPY EASY - SCRIPT.JS
-// GOOGLE LOGIN + CREATE SHOP
-// VERCEL ONLY
-// ==========================================
+// ================================
+// SHOPY EASY
+// LOGIN + CREATE SHOP
+// ================================
 
-const VERCEL_URL =
-    "https://shopy-easy-five.vercel.app";
+const VERCEL_URL = "https://shopy-easy-five.vercel.app";
 
 
-// ==========================================
+// ================================
+// LOGIN BUTTON
+// ================================
+
+function setLoginButton(user) {
+
+    const button = document.getElementById("googleLoginBtn");
+
+    if (!button) return;
+
+    if (user) {
+
+        const name =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split("@")[0] ||
+            "Logged in";
+
+        button.textContent = name;
+
+    } else {
+
+        button.textContent = "Login with Google";
+
+    }
+}
+
+
+// ================================
+// CHECK LOGIN
+// ================================
+
+async function checkLogin() {
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.auth.getUser();
+
+        if (error) throw error;
+
+        setLoginButton(data.user || null);
+
+        return data.user || null;
+
+    } catch (error) {
+
+        console.error("Login check error:", error);
+
+        setLoginButton(null);
+
+        return null;
+    }
+}
+
+
+// ================================
 // GOOGLE LOGIN
-// ==========================================
+// ================================
 
 const googleLoginBtn =
     document.getElementById("googleLoginBtn");
 
 if (googleLoginBtn) {
 
-    googleLoginBtn.addEventListener(
-        "click",
-        async function () {
+    googleLoginBtn.addEventListener("click", async function () {
 
-            try {
+        googleLoginBtn.disabled = true;
 
-                const { error } =
-                    await supabaseClient.auth
-                        .signInWithOAuth({
+        googleLoginBtn.textContent =
+            "Opening Google...";
 
-                            provider: "google",
+        try {
 
-                            options: {
+            const { error } =
+                await supabaseClient.auth.signInWithOAuth({
 
-                                redirectTo:
-                                    VERCEL_URL +
-                                    "/index.html"
+                    provider: "google",
 
-                            }
+                    options: {
 
-                        });
+                        redirectTo:
+                            VERCEL_URL + "/index.html"
 
-                if (error) {
-                    throw error;
-                }
+                    }
 
-            }
+                });
 
-            catch (error) {
+            if (error) throw error;
 
-                console.error(
-                    "Google Login Error:",
-                    error
-                );
+        } catch (error) {
 
-                alert(
-                    "Google Login failed:\n\n" +
-                    error.message
-                );
-            }
+            console.error(
+                "Google Login Error:",
+                error
+            );
 
+            alert(
+                "Google Login failed:\n\n" +
+                error.message
+            );
+
+            googleLoginBtn.disabled = false;
+
+            googleLoginBtn.textContent =
+                "Login with Google";
         }
-    );
+
+    });
 }
 
 
-// ==========================================
-// CHECK LOGIN
-// ==========================================
+// ================================
+// AUTH STATE
+// ================================
 
-async function checkLogin() {
+supabaseClient.auth.onAuthStateChange(
+    function (_event, session) {
 
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.auth
-                .getUser();
-
-        if (error) {
-            console.error(error);
-            return;
-        }
-
-        if (data.user) {
-
-            const loginBtn =
-                document.getElementById(
-                    "googleLoginBtn"
-                );
-
-            if (loginBtn) {
-
-                const user =
-                    data.user;
-
-                const userName =
-                    user.user_metadata?.full_name ||
-                    user.user_metadata?.name ||
-                    user.email?.split("@")[0] ||
-                    "User";
-
-                loginBtn.textContent =
-                    userName;
-            }
-        }
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Login check error:",
-            error
+        setLoginButton(
+            session?.user || null
         );
+
     }
-}
+);
 
 checkLogin();
 
 
-// ==========================================
+// ================================
 // CREATE SHOP
-// ==========================================
+// ================================
 
 const shopForm =
     document.getElementById("shopForm");
@@ -137,51 +151,45 @@ if (shopForm) {
             event.preventDefault();
             event.stopPropagation();
 
-            const createButton =
+            const button =
                 shopForm.querySelector(
                     'button[type="submit"]'
                 );
 
-            if (createButton) {
+            function resetButton() {
 
-                createButton.disabled = true;
+                if (button) {
 
-                createButton.textContent =
-                    "Creating Shop...";
+                    button.disabled = false;
+
+                    button.textContent =
+                        "Create My Shop";
+                }
             }
+
 
             try {
 
-                // ==================================
-                // CHECK SUPABASE
-                // ==================================
+                if (button) {
 
-                if (!window.supabaseClient) {
+                    button.disabled = true;
 
-                    throw new Error(
-                        "Supabase is not loaded."
-                    );
+                    button.textContent =
+                        "Checking login...";
                 }
 
 
-                // ==================================
-                // CHECK LOGIN
-                // ==================================
+                // -------------------------
+                // GET USER
+                // -------------------------
 
-                const {
-                    data: userData,
-                    error: userError
-                } =
-                    await supabaseClient.auth
-                        .getUser();
+                const { data: userData, error: userError } =
+                    await supabaseClient.auth.getUser();
 
-                if (
-                    userError ||
-                    !userData.user
-                ) {
+                if (userError || !userData?.user) {
 
                     throw new Error(
-                        "Please login first."
+                        "Please login with Google first."
                     );
                 }
 
@@ -189,26 +197,36 @@ if (shopForm) {
                     userData.user;
 
 
-                // ==================================
-                // CHECK ROLE
-                // ==================================
+                // -------------------------
+                // GET PROFILE
+                // -------------------------
 
-                const {
-                    data: profile,
-                    error: profileError
-                } =
+                if (button) {
+
+                    button.textContent =
+                        "Checking account...";
+                }
+
+                const { data: profile, error: profileError } =
                     await supabaseClient
                         .from("profiles")
                         .select("role")
                         .eq("id", user.id)
-                        .single();
+                        .maybeSingle();
 
-                if (profileError) {
+                if (profileError)
                     throw profileError;
+
+
+                if (!profile) {
+
+                    throw new Error(
+                        "Profile not found. Please logout and login again."
+                    );
                 }
 
+
                 if (
-                    !profile ||
                     !["member", "admin"]
                         .includes(profile.role)
                 ) {
@@ -219,72 +237,73 @@ if (shopForm) {
                 }
 
 
-                // ==================================
-                // GET FORM DATA
-                // ==================================
+                // -------------------------
+                // FORM VALUES
+                // -------------------------
+
+                function getValue(id) {
+
+                    const element =
+                        document.getElementById(id);
+
+                    return element
+                        ? element.value.trim()
+                        : "";
+                }
+
 
                 const shopName =
-                    document
-                        .getElementById("shopName")
-                        .value
-                        .trim();
+                    getValue("shopName");
 
                 const ownerName =
-                    document
-                        .getElementById("ownerName")
-                        .value
-                        .trim();
+                    getValue("ownerName");
 
                 const mobile =
-                    document
-                        .getElementById("mobile")
-                        .value
-                        .trim();
+                    getValue("mobile");
 
                 const category =
-                    document
-                        .getElementById("category")
-                        .value;
+                    document.getElementById(
+                        "category"
+                    )?.value || "";
 
                 const address =
-                    document
-                        .getElementById("address")
-                        .value
-                        .trim();
+                    getValue("address");
 
                 const maps =
-                    document
-                        .getElementById("maps")
-                        .value
-                        .trim();
+                    getValue("maps");
 
                 const openingTime =
-                    document
-                        .getElementById("openingTime")
-                        .value;
+                    document.getElementById(
+                        "openingTime"
+                    )?.value || "";
 
                 const closingTime =
-                    document
-                        .getElementById("closingTime")
-                        .value;
+                    document.getElementById(
+                        "closingTime"
+                    )?.value || "";
 
 
-                if (!shopName) {
+                if (
+                    !shopName ||
+                    !ownerName ||
+                    !mobile ||
+                    !category ||
+                    !address
+                ) {
 
                     throw new Error(
-                        "Please enter shop name."
+                        "Please fill all required shop details."
                     );
                 }
 
 
-                // ==================================
-                // CREATE UNIQUE SLUG
-                // ==================================
+                // -------------------------
+                // SLUG
+                // -------------------------
 
                 let shopSlug =
                     shopName
                         .toLowerCase()
-                        .trim()
                         .replace(
                             /[^a-z0-9]+/g,
                             "-"
@@ -301,21 +320,22 @@ if (shopForm) {
                     );
                 }
 
+
                 shopSlug =
                     shopSlug +
                     "-" +
                     Date.now();
 
 
-                // ==================================
+                // -------------------------
                 // FACILITIES
-                // ==================================
+                // -------------------------
 
                 const facilities = [];
 
                 document
                     .querySelectorAll(
-                        ".facilities input:checked"
+                        ".facilities input[type='checkbox']:checked"
                     )
                     .forEach(function (item) {
 
@@ -326,13 +346,13 @@ if (shopForm) {
                     });
 
 
-                // ==================================
-                // UPLOAD FILES
-                // ==================================
+                // -------------------------
+                // FILE UPLOAD
+                // -------------------------
 
                 async function uploadFiles(
                     inputId,
-                    folderName
+                    folder
                 ) {
 
                     const input =
@@ -349,56 +369,63 @@ if (shopForm) {
                         return [];
                     }
 
-                    const uploadedImages = [];
+
+                    const urls = [];
 
 
                     for (
-                        const file of input.files
+                        const file
+                        of input.files
                     ) {
 
-                        const safeFileName =
+                        const safeName =
                             file.name.replace(
                                 /[^a-zA-Z0-9._-]/g,
                                 "_"
                             );
+
 
                         const filePath =
                             user.id +
                             "/" +
                             shopSlug +
                             "/" +
-                            folderName +
+                            folder +
                             "/" +
                             Date.now() +
                             "-" +
-                            safeFileName;
+                            safeName;
 
 
-                        const {
-                            error: uploadError
-                        } =
+                        const { error } =
                             await supabaseClient
                                 .storage
-                                .from("shop-images")
+                                .from(
+                                    "shop-images"
+                                )
                                 .upload(
                                     filePath,
                                     file,
                                     {
                                         cacheControl:
                                             "3600",
-                                        upsert: false
+
+                                        upsert:
+                                            false
                                     }
                                 );
 
 
-                        if (uploadError) {
-                            throw uploadError;
+                        if (error) {
+
+                            throw new Error(
+                                "Photo upload failed: " +
+                                error.message
+                            );
                         }
 
 
-                        const {
-                            data: publicData
-                        } =
+                        const { data } =
                             supabaseClient
                                 .storage
                                 .from(
@@ -409,22 +436,26 @@ if (shopForm) {
                                 );
 
 
-                        uploadedImages.push(
-                            publicData.publicUrl
+                        urls.push(
+                            data.publicUrl
                         );
                     }
 
 
-                    return uploadedImages;
+                    return urls;
                 }
 
 
-                // ==================================
-                // UPLOAD ALL PHOTOS
-                // ==================================
+                // -------------------------
+                // UPLOAD
+                // -------------------------
 
-                createButton.textContent =
-                    "Uploading Shop Photos...";
+                if (button) {
+
+                    button.textContent =
+                        "Uploading photos...";
+                }
+
 
                 const shopPhotos =
                     await uploadFiles(
@@ -433,18 +464,12 @@ if (shopForm) {
                     );
 
 
-                createButton.textContent =
-                    "Uploading Menu Photos...";
-
                 const menuPhotos =
                     await uploadFiles(
                         "menuPhotos",
                         "menu"
                     );
 
-
-                createButton.textContent =
-                    "Uploading Visiting Card...";
 
                 const visitingCard =
                     await uploadFiles(
@@ -453,9 +478,6 @@ if (shopForm) {
                     );
 
 
-                createButton.textContent =
-                    "Uploading Other Photos...";
-
                 const otherPhotos =
                     await uploadFiles(
                         "otherPhotos",
@@ -463,16 +485,18 @@ if (shopForm) {
                     );
 
 
-                // ==================================
+                // -------------------------
                 // SAVE SHOP
-                // ==================================
+                // -------------------------
 
-                createButton.textContent =
-                    "Saving Shop...";
+                if (button) {
 
-                const {
-                    error: shopError
-                } =
+                    button.textContent =
+                        "Saving shop...";
+                }
+
+
+                const { error: shopError } =
                     await supabaseClient
                         .from("shops")
                         .insert([{
@@ -499,7 +523,7 @@ if (shopForm) {
                                 address,
 
                             maps:
-                                maps,
+                                maps || null,
 
                             opening_time:
                                 openingTime || null,
@@ -528,14 +552,13 @@ if (shopForm) {
                         }]);
 
 
-                if (shopError) {
+                if (shopError)
                     throw shopError;
-                }
 
 
-                // ==================================
-                // FINAL VERCEL URL
-                // ==================================
+                // -------------------------
+                // VERCEL SHOP URL
+                // -------------------------
 
                 const publicShopURL =
                     VERCEL_URL +
@@ -545,27 +568,16 @@ if (shopForm) {
                     );
 
 
-                console.log(
-                    "SHOP CREATED:",
+                alert(
+                    "Shop created successfully! 🎉"
+                );
+
+
+                window.location.assign(
                     publicShopURL
                 );
 
-
-                alert(
-                    "🎉 Shop created successfully!"
-                );
-
-
-                // ==================================
-                // OPEN VERCEL SHOP PAGE
-                // ==================================
-
-                window.location.href =
-                    publicShopURL;
-
-            }
-
-            catch (error) {
+            } catch (error) {
 
                 console.error(
                     "Create Shop Error:",
@@ -574,21 +586,15 @@ if (shopForm) {
 
                 alert(
                     "Something went wrong:\n\n" +
-                    error.message
+                    (
+                        error.message ||
+                        error
+                    )
                 );
 
-
-                if (createButton) {
-
-                    createButton.disabled =
-                        false;
-
-                    createButton.textContent =
-                        "Create My Shop";
-                }
+                resetButton();
             }
 
         }
     );
 }
-```
