@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,11 +38,16 @@
 
         <form id="shopForm">
 
-            <!-- SHOP INFORMATION -->
+            <!-- =========================
+                 SHOP INFORMATION
+            ========================== -->
 
             <h2>Shop Information</h2>
 
-            <label>Shop Name</label>
+
+            <label for="shopName">
+                Shop Name
+            </label>
 
             <input
                 type="text"
@@ -51,7 +57,9 @@
             >
 
 
-            <label>Owner Name</label>
+            <label for="ownerName">
+                Owner Name
+            </label>
 
             <input
                 type="text"
@@ -61,7 +69,9 @@
             >
 
 
-            <label>Mobile Number</label>
+            <label for="mobile">
+                Mobile Number
+            </label>
 
             <input
                 type="tel"
@@ -71,7 +81,9 @@
             >
 
 
-            <label>Shop Category</label>
+            <label for="category">
+                Shop Category
+            </label>
 
             <select id="category" required>
 
@@ -79,22 +91,47 @@
                     Select Category
                 </option>
 
-                <option>Restaurant</option>
-                <option>Cafe</option>
-                <option>Clothing Shop</option>
-                <option>Grocery Store</option>
-                <option>Mobile Shop</option>
-                <option>Salon</option>
-                <option>Other</option>
+                <option value="Restaurant">
+                    Restaurant
+                </option>
+
+                <option value="Cafe">
+                    Cafe
+                </option>
+
+                <option value="Clothing Shop">
+                    Clothing Shop
+                </option>
+
+                <option value="Grocery Store">
+                    Grocery Store
+                </option>
+
+                <option value="Mobile Shop">
+                    Mobile Shop
+                </option>
+
+                <option value="Salon">
+                    Salon
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
 
             </select>
 
 
-            <!-- ADDRESS -->
+            <!-- =========================
+                 LOCATION
+            ========================== -->
 
             <h2>Shop Location</h2>
 
-            <label>Shop Address</label>
+
+            <label for="address">
+                Shop Address
+            </label>
 
             <textarea
                 id="address"
@@ -104,7 +141,9 @@
             ></textarea>
 
 
-            <label>Google Maps Link</label>
+            <label for="maps">
+                Google Maps Link
+            </label>
 
             <input
                 type="url"
@@ -113,11 +152,16 @@
             >
 
 
-            <!-- TIMING -->
+            <!-- =========================
+                 TIMING
+            ========================== -->
 
             <h2>Shop Timing</h2>
 
-            <label>Opening Time</label>
+
+            <label for="openingTime">
+                Opening Time
+            </label>
 
             <input
                 type="time"
@@ -125,7 +169,9 @@
             >
 
 
-            <label>Closing Time</label>
+            <label for="closingTime">
+                Closing Time
+            </label>
 
             <input
                 type="time"
@@ -133,56 +179,88 @@
             >
 
 
-            <!-- FACILITIES -->
+            <!-- =========================
+                 FACILITIES
+            ========================== -->
 
             <h2>Shop Facilities</h2>
+
 
             <div class="facilities">
 
                 <label>
-                    <input type="checkbox" value="WiFi">
+                    <input
+                        type="checkbox"
+                        value="WiFi"
+                    >
                     WiFi
                 </label>
 
+
                 <label>
-                    <input type="checkbox" value="Parking">
+                    <input
+                        type="checkbox"
+                        value="Parking"
+                    >
                     Parking
                 </label>
 
+
                 <label>
-                    <input type="checkbox" value="Home Delivery">
+                    <input
+                        type="checkbox"
+                        value="Home Delivery"
+                    >
                     Home Delivery
                 </label>
 
+
                 <label>
-                    <input type="checkbox" value="Online Payment">
+                    <input
+                        type="checkbox"
+                        value="Online Payment"
+                    >
                     Online Payment
                 </label>
 
+
                 <label>
-                    <input type="checkbox" value="AC">
+                    <input
+                        type="checkbox"
+                        value="AC"
+                    >
                     AC
                 </label>
 
+
                 <label>
-                    <input type="checkbox" value="UPI">
+                    <input
+                        type="checkbox"
+                        value="UPI"
+                    >
                     UPI Payment
                 </label>
 
             </div>
 
 
-            <!-- PHOTOS -->
+            <!-- =========================
+                 PHOTOS
+            ========================== -->
 
             <h2>Shop Photos</h2>
 
+
             <p class="upload-info">
-                Add photos of your shop, products, menu card,
-                visiting card and other useful images.
+                Add photos of your shop, products,
+                menu card, visiting card and other
+                useful images.
             </p>
 
 
-            <label>Shop / Store Photos</label>
+            <label for="shopPhotos">
+                Shop / Store Photos
+            </label>
 
             <input
                 type="file"
@@ -192,7 +270,9 @@
             >
 
 
-            <label>Menu Card Photos</label>
+            <label for="menuPhotos">
+                Menu Card Photos
+            </label>
 
             <input
                 type="file"
@@ -202,7 +282,9 @@
             >
 
 
-            <label>Visiting Card</label>
+            <label for="visitingCard">
+                Visiting Card
+            </label>
 
             <input
                 type="file"
@@ -212,7 +294,9 @@
             >
 
 
-            <label>Other Photos</label>
+            <label for="otherPhotos">
+                Other Photos
+            </label>
 
             <input
                 type="file"
@@ -222,7 +306,9 @@
             >
 
 
-            <!-- CREATE -->
+            <!-- =========================
+                 CREATE SHOP BUTTON
+            ========================== -->
 
             <button
                 type="submit"
@@ -238,7 +324,16 @@
 </section>
 
 
+<!-- =========================
+     SUPABASE
+========================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
 <script src="script.js"></script>
+
 
 </body>
 </html>
