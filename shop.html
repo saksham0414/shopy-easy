@@ -1,667 +1,304 @@
 // ==========================================
-// SHOPY EASY - SCRIPT.JS
-// LOGIN + SECURE SHOP CREATION
+// SHOPY EASY - PUBLIC SHOP PAGE
 // ==========================================
 
-
-// ==========================================
-// GOOGLE LOGIN
-// ==========================================
-
-const googleLoginBtn = document.getElementById("googleLoginBtn");
-
-if (googleLoginBtn) {
-
-    googleLoginBtn.addEventListener("click", async function () {
-
-        try {
-
-            const { error } =
-                await supabaseClient.auth.signInWithOAuth({
-                    provider: "google",
-
-                    options: {
-                        redirectTo:
-                            window.location.origin +
-                            "/shopy-easy/index.html"
-                    }
-                });
-
-            if (error) {
-                console.error(error);
-                alert("Google Login failed:\n\n" + error.message);
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert(
-                "Google Login Error:\n\n" +
-                error.message
-            );
-        }
-
-    });
-
-}
+const params = new URLSearchParams(window.location.search);
+const shopSlug = params.get("shop");
 
 
 // ==========================================
-// CHECK LOGIN
+// LOAD SHOP
 // ==========================================
 
-async function checkLogin() {
+async function loadShop() {
+
+    if (!shopSlug) {
+        document.body.innerHTML =
+            "<h2>Shop not found.</h2>";
+        return;
+    }
 
     try {
 
         const {
-            data,
+            data: shop,
             error
-        } = await supabaseClient.auth.getUser();
+        } = await supabaseClient
+            .from("shops")
+            .select("*")
+            .eq("slug", shopSlug)
+            .eq("published", true)
+            .single();
 
         if (error) {
-            console.error("Login check error:", error);
-            return;
+            throw error;
         }
 
-        if (data && data.user) {
+        if (!shop) {
+            throw new Error("Shop not found.");
+        }
 
-            const loginBtn =
-                document.getElementById("googleLoginBtn");
 
-            if (loginBtn) {
+        // ==================================
+        // BASIC INFORMATION
+        // ==================================
 
-                const user = data.user;
+        const name =
+            document.getElementById("shopName");
 
-                const userName =
-                    user.user_metadata?.full_name ||
-                    user.user_metadata?.name ||
-                    user.email?.split("@")[0] ||
-                    "User";
+        const owner =
+            document.getElementById("ownerName");
 
-                loginBtn.textContent = userName;
+        const mobile =
+            document.getElementById("mobile");
+
+        const category =
+            document.getElementById("category");
+
+        const address =
+            document.getElementById("address");
+
+        const opening =
+            document.getElementById("openingTime");
+
+        const closing =
+            document.getElementById("closingTime");
+
+
+        if (name)
+            name.textContent = shop.name || "";
+
+        if (owner)
+            owner.textContent =
+                shop.owner_name || "";
+
+        if (mobile)
+            mobile.textContent =
+                shop.mobile || "";
+
+        if (category)
+            category.textContent =
+                shop.category || "";
+
+        if (address)
+            address.textContent =
+                shop.address || "";
+
+        if (opening)
+            opening.textContent =
+                shop.opening_time || "";
+
+        if (closing)
+            closing.textContent =
+                shop.closing_time || "";
+
+
+        // ==================================
+        // FACILITIES
+        // ==================================
+
+        const facilitiesContainer =
+            document.getElementById(
+                "facilities"
+            );
+
+        if (facilitiesContainer) {
+
+            facilitiesContainer.innerHTML = "";
+
+            const facilities =
+                shop.facilities || [];
+
+            facilities.forEach(function (facility) {
+
+                const span =
+                    document.createElement("span");
+
+                span.textContent =
+                    "✓ " + facility;
+
+                facilitiesContainer.appendChild(
+                    span
+                );
+            });
+        }
+
+
+        // ==================================
+        // MAP
+        // ==================================
+
+        const mapsButton =
+            document.getElementById("maps");
+
+        if (mapsButton && shop.maps) {
+
+            mapsButton.href = shop.maps;
+            mapsButton.target = "_blank";
+            mapsButton.rel =
+                "noopener noreferrer";
+        }
+
+
+        // ==================================
+        // PHONE
+        // ==================================
+
+        const callButton =
+            document.getElementById("callButton");
+
+        if (callButton && shop.mobile) {
+
+            callButton.href =
+                "tel:" + shop.mobile;
+        }
+
+
+        // ==================================
+        // DISPLAY IMAGES
+        // ==================================
+
+        function showImages(
+            containerId,
+            images
+        ) {
+
+            const container =
+                document.getElementById(
+                    containerId
+                );
+
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            if (!images || images.length === 0) {
+                return;
             }
 
-            console.log("Logged in user:", data.user);
+            images.forEach(function (image) {
+
+                const img =
+                    document.createElement("img");
+
+                img.src =
+                    typeof image === "string"
+                        ? image
+                        : image.url;
+
+                img.alt =
+                    shop.name || "Shop";
+
+                img.loading = "lazy";
+
+                container.appendChild(img);
+            });
         }
+
+
+        showImages(
+            "shopPhotos",
+            shop.shop_photos
+        );
+
+        showImages(
+            "menuPhotos",
+            shop.menu_photos
+        );
+
+        showImages(
+            "visitingCard",
+            shop.visiting_card
+        );
+
+        showImages(
+            "otherPhotos",
+            shop.other_photos
+        );
+
+
+        // ==================================
+        // QR CODE
+        // ==================================
+
+        const qrImage =
+            document.getElementById("qrCode");
+
+        if (qrImage) {
+
+            // FIXED PUBLIC URL
+            const publicShopURL =
+                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
+                encodeURIComponent(shop.slug);
+
+
+            // QR Server
+            qrImage.src =
+                "https://api.qrserver.com/v1/create-qr-code/" +
+                "?size=500x500" +
+                "&margin=10" +
+                "&data=" +
+                encodeURIComponent(
+                    publicShopURL
+                );
+
+
+            // Make QR clickable too
+            qrImage.style.cursor = "pointer";
+
+            qrImage.onclick = function () {
+
+                window.open(
+                    publicShopURL,
+                    "_blank"
+                );
+            };
+
+
+            console.log(
+                "QR URL:",
+                publicShopURL
+            );
+        }
+
+
+        // ==================================
+        // SHOP URL TEXT
+        // ==================================
+
+        const shopURL =
+            document.getElementById("shopURL");
+
+        if (shopURL) {
+
+            const publicShopURL =
+                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
+                encodeURIComponent(shop.slug);
+
+            shopURL.textContent =
+                publicShopURL;
+
+            shopURL.href =
+                publicShopURL;
+
+            shopURL.target = "_blank";
+        }
+
 
     } catch (error) {
 
-        console.error("Login check failed:", error);
+        console.error(
+            "Shop loading error:",
+            error
+        );
+
+        document.body.innerHTML =
+            "<h2>Unable to load shop</h2>" +
+            "<p>" +
+            error.message +
+            "</p>";
     }
 }
 
-checkLogin();
 
-
-// ==========================================
-// CREATE SHOP
-// ==========================================
-
-const shopForm =
-    document.getElementById("shopForm");
-
-if (shopForm) {
-
-    shopForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            console.log("CREATE SHOP BUTTON CLICKED");
-
-            const createButton =
-                document.querySelector(".create-btn");
-
-
-            // ==================================
-            // BUTTON LOADING
-            // ==================================
-
-            if (createButton) {
-
-                createButton.disabled = true;
-
-                createButton.textContent =
-                    "Creating Shop...";
-            }
-
-
-            try {
-
-                // ==================================
-                // 1. CHECK SUPABASE
-                // ==================================
-
-                if (
-                    typeof supabaseClient ===
-                    "undefined"
-                ) {
-
-                    throw new Error(
-                        "Supabase is not loaded."
-                    );
-                }
-
-
-                // ==================================
-                // 2. CHECK LOGIN
-                // ==================================
-
-                console.log("Checking login...");
-
-                const {
-                    data: userData,
-                    error: userError
-                } =
-                    await supabaseClient.auth.getUser();
-
-                if (userError) {
-
-                    throw new Error(
-                        "Login check failed: " +
-                        userError.message
-                    );
-                }
-
-                const user =
-                    userData?.user;
-
-                if (!user) {
-
-                    alert(
-                        "Please login with Google first."
-                    );
-
-                    window.location.href =
-                        "index.html";
-
-                    return;
-                }
-
-
-                console.log(
-                    "Logged in:",
-                    user.email
-                );
-
-
-                // ==================================
-                // 3. CHECK USER ROLE
-                // ==================================
-
-                console.log("Checking user role...");
-
-                const {
-                    data: profile,
-                    error: profileError
-                } =
-                    await supabaseClient
-                        .from("profiles")
-                        .select("role")
-                        .eq("id", user.id)
-                        .single();
-
-                if (profileError) {
-
-                    throw new Error(
-                        "Profile check failed: " +
-                        profileError.message
-                    );
-                }
-
-                if (
-                    !profile ||
-                    !["member", "admin"]
-                        .includes(profile.role)
-                ) {
-
-                    alert(
-                        "Access Denied!\n\n" +
-                        "Only Admin and Member accounts " +
-                        "can create a shop."
-                    );
-
-                    return;
-                }
-
-
-                console.log(
-                    "Role:",
-                    profile.role
-                );
-
-
-                // ==================================
-                // 4. GET FORM DATA
-                // ==================================
-
-                const shopName =
-                    document
-                        .getElementById("shopName")
-                        .value
-                        .trim();
-
-                const ownerName =
-                    document
-                        .getElementById("ownerName")
-                        .value
-                        .trim();
-
-                const mobile =
-                    document
-                        .getElementById("mobile")
-                        .value
-                        .trim();
-
-                const category =
-                    document
-                        .getElementById("category")
-                        .value;
-
-                const address =
-                    document
-                        .getElementById("address")
-                        .value
-                        .trim();
-
-                const maps =
-                    document
-                        .getElementById("maps")
-                        .value
-                        .trim();
-
-                const openingTime =
-                    document
-                        .getElementById("openingTime")
-                        .value;
-
-                const closingTime =
-                    document
-                        .getElementById("closingTime")
-                        .value;
-
-
-                if (!shopName) {
-
-                    throw new Error(
-                        "Please enter shop name."
-                    );
-                }
-
-
-                // ==================================
-                // 5. CREATE UNIQUE SLUG
-                // ==================================
-
-                let shopSlug =
-                    shopName
-                        .toLowerCase()
-                        .trim()
-                        .replace(
-                            /[^a-z0-9]+/g,
-                            "-"
-                        )
-                        .replace(
-                            /^-+|-+$/g,
-                            ""
-                        );
-
-
-                if (!shopSlug) {
-
-                    throw new Error(
-                        "Invalid shop name."
-                    );
-                }
-
-
-                shopSlug =
-                    shopSlug +
-                    "-" +
-                    Date.now();
-
-
-                console.log(
-                    "Shop slug:",
-                    shopSlug
-                );
-
-
-                // ==================================
-                // 6. GET FACILITIES
-                // ==================================
-
-                const facilities = [];
-
-                document
-                    .querySelectorAll(
-                        ".facilities input:checked"
-                    )
-                    .forEach(function (item) {
-
-                        facilities.push(
-                            item.value
-                        );
-                    });
-
-
-                // ==================================
-                // 7. UPLOAD FILES
-                // ==================================
-
-                async function uploadFiles(
-                    inputId,
-                    folderName
-                ) {
-
-                    const input =
-                        document.getElementById(
-                            inputId
-                        );
-
-                    if (
-                        !input ||
-                        !input.files ||
-                        input.files.length === 0
-                    ) {
-
-                        return [];
-                    }
-
-
-                    const uploadedImages = [];
-
-
-                    for (
-                        let i = 0;
-                        i < input.files.length;
-                        i++
-                    ) {
-
-                        const file =
-                            input.files[i];
-
-
-                        console.log(
-                            "Uploading:",
-                            file.name
-                        );
-
-
-                        if (createButton) {
-
-                            createButton.textContent =
-                                "Uploading " +
-                                folderName +
-                                " (" +
-                                (i + 1) +
-                                "/" +
-                                input.files.length +
-                                ")...";
-                        }
-
-
-                        const safeFileName =
-                            file.name
-                                .replace(
-                                    /[^a-zA-Z0-9._-]/g,
-                                    "_"
-                                );
-
-
-                        const filePath =
-                            user.id +
-                            "/" +
-                            shopSlug +
-                            "/" +
-                            folderName +
-                            "/" +
-                            Date.now() +
-                            "-" +
-                            i +
-                            "-" +
-                            safeFileName;
-
-
-                        const {
-                            error: uploadError
-                        } =
-                            await supabaseClient
-                                .storage
-                                .from("shop-images")
-                                .upload(
-                                    filePath,
-                                    file
-                                );
-
-
-                        if (uploadError) {
-
-                            throw new Error(
-                                "Photo upload failed:\n" +
-                                file.name +
-                                "\n\n" +
-                                uploadError.message
-                            );
-                        }
-
-
-                        const {
-                            data: publicData
-                        } =
-                            supabaseClient
-                                .storage
-                                .from("shop-images")
-                                .getPublicUrl(
-                                    filePath
-                                );
-
-
-                        uploadedImages.push({
-
-                            name:
-                                file.name,
-
-                            path:
-                                filePath,
-
-                            url:
-                                publicData.publicUrl
-                        });
-                    }
-
-
-                    return uploadedImages;
-                }
-
-
-                // ==================================
-                // 8. UPLOAD SHOP PHOTOS
-                // ==================================
-
-                const shopPhotos =
-                    await uploadFiles(
-                        "shopPhotos",
-                        "shop"
-                    );
-
-
-                // ==================================
-                // 9. UPLOAD MENU PHOTOS
-                // ==================================
-
-                const menuPhotos =
-                    await uploadFiles(
-                        "menuPhotos",
-                        "menu"
-                    );
-
-
-                // ==================================
-                // 10. UPLOAD VISITING CARD
-                // ==================================
-
-                const visitingCard =
-                    await uploadFiles(
-                        "visitingCard",
-                        "visiting-card"
-                    );
-
-
-                // ==================================
-                // 11. UPLOAD OTHER PHOTOS
-                // ==================================
-
-                const otherPhotos =
-                    await uploadFiles(
-                        "otherPhotos",
-                        "other"
-                    );
-
-
-                // ==================================
-                // 12. SAVE SHOP TO DATABASE
-                // ==================================
-
-                if (createButton) {
-
-                    createButton.textContent =
-                        "Saving Shop...";
-                }
-
-
-                console.log(
-                    "Saving shop to database..."
-                );
-
-
-                const {
-                    error: shopError
-                } =
-                    await supabaseClient
-                        .from("shops")
-                        .insert([{
-
-                            owner_id:
-                                user.id,
-
-                            name:
-                                shopName,
-
-                            slug:
-                                shopSlug,
-
-                            owner_name:
-                                ownerName,
-
-                            mobile:
-                                mobile,
-
-                            category:
-                                category,
-
-                            address:
-                                address,
-
-                            maps:
-                                maps,
-
-                            opening_time:
-                                openingTime ||
-                                null,
-
-                            closing_time:
-                                closingTime ||
-                                null,
-
-                            facilities:
-                                facilities,
-
-                            shop_photos:
-                                shopPhotos,
-
-                            menu_photos:
-                                menuPhotos,
-
-                            visiting_card:
-                                visitingCard,
-
-                            other_photos:
-                                otherPhotos,
-
-                            published:
-                                true
-                        }]);
-
-
-                if (shopError) {
-
-                    throw new Error(
-                        "Database error:\n\n" +
-                        shopError.message
-                    );
-                }
-
-
-                // ==================================
-                // 13. SUCCESS
-                // ==================================
-
-                console.log(
-                    "SHOP CREATED SUCCESSFULLY"
-                );
-
-
-                alert(
-                    "🎉 Shop created successfully!"
-                );
-
-
-                // ==================================
-                // 14. OPEN PUBLIC SHOP
-                // ==================================
-
-                window.location.href =
-                    "shop.html?shop=" +
-                    encodeURIComponent(
-                        shopSlug
-                    );
-
-            }
-
-
-            // ==================================
-            // ERROR HANDLING
-            // ==================================
-
-            catch (error) {
-
-                console.error(
-                    "CREATE SHOP ERROR:",
-                    error
-                );
-
-
-                alert(
-                    "❌ Shop creation failed\n\n" +
-                    error.message
-                );
-
-
-                if (createButton) {
-
-                    createButton.disabled =
-                        false;
-
-                    createButton.textContent =
-                        "Create My Shop";
-                }
-            }
-
-        }
-    );
-}
+loadShop();
