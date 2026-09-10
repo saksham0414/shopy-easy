@@ -1,99 +1,284 @@
-const savedShop =
-    localStorage.getItem("shopyEasyShop");
+// ==========================================
+// SHOPY EASY - PUBLIC SHOP PAGE
+// ==========================================
+
+// Check Supabase
+if (typeof supabaseClient === "undefined") {
+    alert("Supabase is not loaded.");
+    throw new Error("supabaseClient not found");
+}
 
 
-if (!savedShop) {
+// ==========================================
+// GET SHOP SLUG FROM URL
+// Example:
+// shop.html?shop=rahul-cafe
+// ==========================================
 
-    alert("No shop information found.");
-
-    window.location.href =
-        "create-shop.html";
-
-} else {
-
-    const shop =
-        JSON.parse(savedShop);
+const urlParams = new URLSearchParams(window.location.search);
+const shopSlug = urlParams.get("shop");
 
 
-    // =================================
-    // BASIC INFORMATION
-    // =================================
+// ==========================================
+// IF NO SHOP SLUG
+// ==========================================
 
-    document.getElementById("shopName")
-        .textContent = shop.name;
+if (!shopSlug) {
 
-    document.getElementById("shopOwner")
-        .textContent =
-        "Owner: " + shop.owner;
+    alert("This shop is not added.");
 
-    document.getElementById("shopCategory")
-        .textContent =
-        shop.category;
+    window.location.href = "index.html";
+
+}
 
 
-    document.getElementById("shopAddress")
-        .textContent =
-        shop.address;
+// ==========================================
+// LOAD SHOP
+// ==========================================
+
+async function loadShop() {
+
+    try {
+
+        const { data: shop, error } = await supabaseClient
+            .from("shops")
+            .select("*")
+            .eq("slug", shopSlug)
+            .eq("published", true)
+            .single();
 
 
-    document.getElementById("shopMobile")
-        .textContent =
-        shop.mobile;
+        // ------------------------------------------
+        // SHOP NOT FOUND
+        // ------------------------------------------
+
+        if (error || !shop) {
+
+            console.error("Shop loading error:", error);
+
+            alert("This shop is not added.");
+
+            return;
+        }
 
 
-    // =================================
-    // TIMING
-    // =================================
+        // ------------------------------------------
+        // BASIC SHOP INFORMATION
+        // ------------------------------------------
 
-    let timing = "Not available";
+        const shopName =
+            document.getElementById("shopName");
+
+        const shopOwner =
+            document.getElementById("shopOwner");
+
+        const shopCategory =
+            document.getElementById("shopCategory");
+
+        const shopAddress =
+            document.getElementById("shopAddress");
+
+        const shopMobile =
+            document.getElementById("shopMobile");
+
+        const shopTiming =
+            document.getElementById("shopTiming");
 
 
-    if (shop.opening && shop.closing) {
+        if (shopName) {
+            shopName.textContent =
+                shop.name || "My Shop";
+        }
 
-        timing =
-            shop.opening +
-            " - " +
-            shop.closing;
 
+        if (shopOwner) {
+            shopOwner.textContent =
+                shop.owner_name
+                    ? "Owner: " + shop.owner_name
+                    : "Welcome to our shop";
+        }
+
+
+        if (shopCategory) {
+            shopCategory.textContent =
+                shop.category || "SHOP";
+        }
+
+
+        if (shopAddress) {
+            shopAddress.textContent =
+                shop.address || "Not available";
+        }
+
+
+        if (shopMobile) {
+            shopMobile.textContent =
+                shop.mobile || "Not available";
+        }
+
+
+        // ==========================================
+        // SHOP TIMING
+        // ==========================================
+
+        if (shopTiming) {
+
+            if (shop.opening_time && shop.closing_time) {
+
+                shopTiming.textContent =
+                    shop.opening_time +
+                    " - " +
+                    shop.closing_time;
+
+            } else {
+
+                shopTiming.textContent =
+                    "Not available";
+            }
+        }
+
+
+        // ==========================================
+        // FACILITIES
+        // ==========================================
+
+        displayFacilities(shop.facilities);
+
+
+        // ==========================================
+        // SHOP PHOTOS
+        // ==========================================
+
+        displayImages(
+            shop.shop_photos,
+            "shopPhotoGrid",
+            "gallery-image"
+        );
+
+
+        // ==========================================
+        // MENU PHOTOS
+        // ==========================================
+
+        displayImages(
+            shop.menu_photos,
+            "menuPhotoGrid",
+            "document-image"
+        );
+
+
+        // ==========================================
+        // VISITING CARD
+        // ==========================================
+
+        displayImages(
+            shop.visiting_card,
+            "visitingCardGrid",
+            "document-image"
+        );
+
+
+        // ==========================================
+        // OTHER PHOTOS
+        // ==========================================
+
+        displayImages(
+            shop.other_photos,
+            "otherPhotoGrid",
+            "gallery-image"
+        );
+
+
+        // ==========================================
+        // GOOGLE MAPS
+        // ==========================================
+
+        const mapsButton =
+            document.getElementById("mapsButton");
+
+        const locationText =
+            document.getElementById("locationText");
+
+
+        if (shop.maps) {
+
+            mapsButton.href = shop.maps;
+
+            mapsButton.style.display =
+                "inline-block";
+
+            locationText.textContent =
+                "Tap the button below to see our exact location.";
+
+        } else {
+
+            mapsButton.style.display =
+                "none";
+
+            locationText.textContent =
+                "Google Maps location has not been added.";
+        }
+
+
+        // ==========================================
+        // GENERATE QR CODE
+        // ==========================================
+
+        generateQRCode();
+
+
+    } catch (error) {
+
+        console.error(
+            "Unexpected error:",
+            error
+        );
+
+        alert(
+            "Something went wrong while loading this shop."
+        );
+    }
+}
+
+
+// ==========================================
+// DISPLAY FACILITIES
+// ==========================================
+
+function displayFacilities(facilities) {
+
+    const facilitiesList =
+        document.getElementById("facilitiesList");
+
+
+    if (!facilitiesList) {
+        return;
     }
 
 
-    document.getElementById("shopTiming")
-        .textContent =
-        timing;
+    facilitiesList.innerHTML = "";
 
 
-    // =================================
-    // FACILITIES
-    // =================================
-
-    const facilitiesList =
-        document.getElementById(
-            "facilitiesList"
-        );
-
-
+    // Supabase JSONB can return an array
     if (
-        shop.facilities &&
-        shop.facilities.length > 0
+        Array.isArray(facilities) &&
+        facilities.length > 0
     ) {
 
-        shop.facilities.forEach(
-            function (facility) {
+        facilities.forEach(function (facility) {
 
-                const item =
-                    document.createElement("div");
+            const item =
+                document.createElement("div");
 
-                item.className =
-                    "facility-item";
+            item.className =
+                "facility-item";
 
-                item.textContent =
-                    "✓ " + facility;
+            item.textContent =
+                "✓ " + facility;
 
-                facilitiesList.appendChild(item);
+            facilitiesList.appendChild(item);
 
-            }
-        );
+        });
 
     } else {
 
@@ -101,184 +286,261 @@ if (!savedShop) {
             `<div class="empty-message">
                 No facilities added.
             </div>`;
-
     }
-
-
-    // =================================
-    // IMAGE FUNCTION
-    // =================================
-
-    function displayImages(
-        images,
-        containerId,
-        imageClass
-    ) {
-
-        const container =
-            document.getElementById(
-                containerId
-            );
-
-
-        if (
-            images &&
-            images.length > 0
-        ) {
-
-            images.forEach(
-                function (image) {
-
-                    const img =
-                        document.createElement("img");
-
-                    img.src =
-                        image.data;
-
-                    img.alt =
-                        image.name;
-
-                    img.className =
-                        imageClass;
-
-                    container.appendChild(img);
-
-                }
-            );
-
-        } else {
-
-            container.innerHTML =
-                `<div class="empty-message">
-                    No photos uploaded.
-                </div>`;
-
-        }
-
-    }
-
-
-    // =================================
-    // SHOP PHOTOS
-    // =================================
-
-    displayImages(
-        shop.shopPhotos,
-        "shopPhotoGrid",
-        "gallery-image"
-    );
-
-
-    // =================================
-    // MENU PHOTOS
-    // =================================
-
-    displayImages(
-        shop.menuPhotos,
-        "menuPhotoGrid",
-        "document-image"
-    );
-
-
-    // =================================
-    // VISITING CARD
-    // =================================
-
-    displayImages(
-        shop.visitingCard,
-        "visitingCardGrid",
-        "document-image"
-    );
-
-
-    // =================================
-    // OTHER PHOTOS
-    // =================================
-
-    displayImages(
-        shop.otherPhotos,
-        "otherPhotoGrid",
-        "gallery-image"
-    );
-
-
-    // =================================
-    // GOOGLE MAPS
-    // =================================
-
-    const mapsButton =
-        document.getElementById(
-            "mapsButton"
-        );
-
-
-    const locationText =
-        document.getElementById(
-            "locationText"
-        );
-
-
-    if (shop.maps) {
-
-        mapsButton.href =
-            shop.maps;
-
-        locationText.textContent =
-            "Tap the button below to see our exact location.";
-
-    } else {
-
-        mapsButton.style.display =
-            "none";
-
-        locationText.textContent =
-            "Google Maps location has not been added.";
-
-    }
-
-
-    // =================================
-    // QR CODE
-    // =================================
-
-    const currentURL =
-    "https://shopy-easy-five.vercel.app" +
-    window.location.pathname +
-    window.location.search;
-
-
-    const qrURL =
-        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="
-        + encodeURIComponent(currentURL);
-
-
-    document.getElementById("qrCode")
-        .src = qrURL;
-
 }
 
 
-// =====================================
-// DOWNLOAD QR
-// =====================================
+// ==========================================
+// DISPLAY IMAGES
+// ==========================================
 
-function downloadQR() {
+function displayImages(
+    images,
+    containerId,
+    imageClass
+) {
+
+    const container =
+        document.getElementById(containerId);
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    // No images
+    if (
+        !Array.isArray(images) ||
+        images.length === 0
+    ) {
+
+        container.innerHTML =
+            `<div class="empty-message">
+                No photos uploaded.
+            </div>`;
+
+        return;
+    }
+
+
+    // ------------------------------------------
+    // SHOW EVERY IMAGE ONE BY ONE
+    // ------------------------------------------
+
+    images.forEach(function (image, index) {
+
+        let imageURL = "";
+        let imageName = "Shop Image";
+
+
+        // --------------------------------------
+        // If database contains an object
+        // --------------------------------------
+
+        if (
+            typeof image === "object" &&
+            image !== null
+        ) {
+
+            imageURL =
+                image.url ||
+                image.publicUrl ||
+                image.data ||
+                image.path ||
+                "";
+
+            imageName =
+                image.name ||
+                "Shop Image";
+
+        }
+
+
+        // --------------------------------------
+        // If database contains a direct URL
+        // --------------------------------------
+
+        else if (
+            typeof image === "string"
+        ) {
+
+            imageURL = image;
+
+        }
+
+
+        // --------------------------------------
+        // Ignore invalid image
+        // --------------------------------------
+
+        if (!imageURL) {
+            return;
+        }
+
+
+        // --------------------------------------
+        // Create wrapper
+        // --------------------------------------
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "single-shop-image";
+
+
+        // --------------------------------------
+        // Create image
+        // --------------------------------------
+
+        const img =
+            document.createElement("img");
+
+        img.src = imageURL;
+
+        img.alt =
+            imageName ||
+            "Shop Image";
+
+        img.className =
+            imageClass;
+
+
+        // --------------------------------------
+        // Prevent broken image layout
+        // --------------------------------------
+
+        img.loading = "lazy";
+
+
+        // --------------------------------------
+        // If image cannot load
+        // --------------------------------------
+
+        img.onerror = function () {
+
+            wrapper.remove();
+
+        };
+
+
+        wrapper.appendChild(img);
+
+        container.appendChild(wrapper);
+
+    });
+}
+
+
+// ==========================================
+// GENERATE SHOP QR CODE
+// ==========================================
+
+function generateQRCode() {
+
+    const qrCode =
+        document.getElementById("qrCode");
+
+
+    if (!qrCode) {
+        return;
+    }
+
+
+    // Current exact shop URL
+    const currentURL =
+        window.location.href;
+
+
+    const qrURL =
+        "https://api.qrserver.com/v1/create-qr-code/" +
+        "?size=500x500&data=" +
+        encodeURIComponent(currentURL);
+
+
+    qrCode.src = qrURL;
+
+    qrCode.alt =
+        "QR Code for " + shopSlug;
+}
+
+
+// ==========================================
+// DOWNLOAD QR CODE
+// ==========================================
+
+async function downloadQR() {
 
     const qr =
         document.getElementById("qrCode");
 
 
-    const link =
-        document.createElement("a");
+    if (!qr || !qr.src) {
+
+        alert("QR code is not ready.");
+
+        return;
+    }
 
 
-    link.href =
-        qr.src;
+    try {
 
-    link.download =
-        "Shopy-Easy-QR.png";
+        const response =
+            await fetch(qr.src);
+
+        const blob =
+            await response.blob();
 
 
-    link.click();
+        const url =
+            URL.createObjectURL(blob);
 
+
+        const link =
+            document.createElement("a");
+
+
+        link.href = url;
+
+        link.download =
+            "Shopy-Easy-" +
+            shopSlug +
+            "-QR.png";
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+
+
+        URL.revokeObjectURL(url);
+
+
+    } catch (error) {
+
+        console.error(
+            "QR download error:",
+            error
+        );
+
+
+        // Fallback
+        window.open(
+            qr.src,
+            "_blank"
+        );
+    }
 }
+
+
+// ==========================================
+// START
+// ==========================================
+
+loadShop();
