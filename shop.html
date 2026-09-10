@@ -1,304 +1,441 @@
-// ==========================================
-// SHOPY EASY - PUBLIC SHOP PAGE
-// ==========================================
+<!DOCTYPE html>
+<html lang="en">
 
-const params = new URLSearchParams(window.location.search);
-const shopSlug = params.get("shop");
+<head>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-// ==========================================
-// LOAD SHOP
-// ==========================================
+    <title>Digital Shop | Shopy Easy</title>
 
-async function loadShop() {
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
 
-    if (!shopSlug) {
-        document.body.innerHTML =
-            "<h2>Shop not found.</h2>";
-        return;
-    }
+<body>
 
-    try {
+    <!-- ==============================
+         SHOP PAGE
+    =============================== -->
 
-        const {
-            data: shop,
-            error
-        } = await supabaseClient
-            .from("shops")
-            .select("*")
-            .eq("slug", shopSlug)
-            .eq("published", true)
-            .single();
+    <main class="digital-shop">
 
-        if (error) {
-            throw error;
-        }
+        <!-- SHOP HEADER -->
+        <section class="shop-hero">
 
-        if (!shop) {
-            throw new Error("Shop not found.");
-        }
+            <div class="shop-hero-content">
 
+                <p
+                    class="shop-category"
+                    id="category"
+                >
+                    SHOP
+                </p>
 
-        // ==================================
-        // BASIC INFORMATION
-        // ==================================
+                <h1 id="shopName">
+                    Loading...
+                </h1>
 
-        const name =
-            document.getElementById("shopName");
+                <p>
+                    Digital Shop powered by
+                    <strong>Shopy Easy</strong>
+                </p>
 
-        const owner =
-            document.getElementById("ownerName");
+            </div>
 
-        const mobile =
-            document.getElementById("mobile");
+        </section>
 
-        const category =
-            document.getElementById("category");
 
-        const address =
-            document.getElementById("address");
+        <!-- ==============================
+             SHOP INFORMATION
+        =============================== -->
 
-        const opening =
-            document.getElementById("openingTime");
+        <section class="shop-section">
 
-        const closing =
-            document.getElementById("closingTime");
+            <div class="section-heading">
 
+                <span>ABOUT THE SHOP</span>
 
-        if (name)
-            name.textContent = shop.name || "";
+                <h2>Shop Information</h2>
 
-        if (owner)
-            owner.textContent =
-                shop.owner_name || "";
+                <p>
+                    Everything you need to know about this shop.
+                </p>
 
-        if (mobile)
-            mobile.textContent =
-                shop.mobile || "";
+            </div>
 
-        if (category)
-            category.textContent =
-                shop.category || "";
 
-        if (address)
-            address.textContent =
-                shop.address || "";
+            <div class="information-card">
 
-        if (opening)
-            opening.textContent =
-                shop.opening_time || "";
+                <!-- OWNER -->
 
-        if (closing)
-            closing.textContent =
-                shop.closing_time || "";
+                <div class="info-item">
 
+                    <div class="info-icon">
+                        👤
+                    </div>
 
-        // ==================================
-        // FACILITIES
-        // ==================================
+                    <div>
 
-        const facilitiesContainer =
-            document.getElementById(
-                "facilities"
-            );
+                        <strong>Owner</strong>
 
-        if (facilitiesContainer) {
+                        <p id="ownerName">
+                            Loading...
+                        </p>
 
-            facilitiesContainer.innerHTML = "";
+                    </div>
 
-            const facilities =
-                shop.facilities || [];
+                </div>
 
-            facilities.forEach(function (facility) {
 
-                const span =
-                    document.createElement("span");
+                <!-- CONTACT -->
 
-                span.textContent =
-                    "✓ " + facility;
+                <div class="info-item">
 
-                facilitiesContainer.appendChild(
-                    span
-                );
-            });
-        }
+                    <div class="info-icon">
+                        📞
+                    </div>
 
+                    <div>
 
-        // ==================================
-        // MAP
-        // ==================================
+                        <strong>Contact</strong>
 
-        const mapsButton =
-            document.getElementById("maps");
+                        <p>
 
-        if (mapsButton && shop.maps) {
+                            <a
+                                id="callButton"
+                                href="#"
+                            >
 
-            mapsButton.href = shop.maps;
-            mapsButton.target = "_blank";
-            mapsButton.rel =
-                "noopener noreferrer";
-        }
+                                <span id="mobile">
+                                    Loading...
+                                </span>
 
+                            </a>
 
-        // ==================================
-        // PHONE
-        // ==================================
+                        </p>
 
-        const callButton =
-            document.getElementById("callButton");
+                    </div>
 
-        if (callButton && shop.mobile) {
+                </div>
 
-            callButton.href =
-                "tel:" + shop.mobile;
-        }
 
+                <!-- ADDRESS -->
 
-        // ==================================
-        // DISPLAY IMAGES
-        // ==================================
+                <div class="info-item">
 
-        function showImages(
-            containerId,
-            images
-        ) {
+                    <div class="info-icon">
+                        📍
+                    </div>
 
-            const container =
-                document.getElementById(
-                    containerId
-                );
+                    <div>
 
-            if (!container) return;
+                        <strong>Address</strong>
 
-            container.innerHTML = "";
+                        <p id="address">
+                            Loading...
+                        </p>
 
-            if (!images || images.length === 0) {
-                return;
-            }
+                        <a
+                            id="maps"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="primary-btn"
+                        >
+                            📍 Open in Google Maps
+                        </a>
 
-            images.forEach(function (image) {
+                    </div>
 
-                const img =
-                    document.createElement("img");
+                </div>
 
-                img.src =
-                    typeof image === "string"
-                        ? image
-                        : image.url;
 
-                img.alt =
-                    shop.name || "Shop";
+                <!-- TIMING -->
 
-                img.loading = "lazy";
+                <div class="info-item">
 
-                container.appendChild(img);
-            });
-        }
+                    <div class="info-icon">
+                        🕒
+                    </div>
 
+                    <div>
 
-        showImages(
-            "shopPhotos",
-            shop.shop_photos
-        );
+                        <strong>Opening Hours</strong>
 
-        showImages(
-            "menuPhotos",
-            shop.menu_photos
-        );
+                        <p>
 
-        showImages(
-            "visitingCard",
-            shop.visiting_card
-        );
+                            <span id="openingTime">
+                                --
+                            </span>
 
-        showImages(
-            "otherPhotos",
-            shop.other_photos
-        );
+                            &nbsp; - &nbsp;
 
+                            <span id="closingTime">
+                                --
+                            </span>
 
-        // ==================================
-        // QR CODE
-        // ==================================
+                        </p>
 
-        const qrImage =
-            document.getElementById("qrCode");
+                    </div>
 
-        if (qrImage) {
+                </div>
 
-            // FIXED PUBLIC URL
-            const publicShopURL =
-                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
-                encodeURIComponent(shop.slug);
+            </div>
 
+        </section>
 
-            // QR Server
-            qrImage.src =
-                "https://api.qrserver.com/v1/create-qr-code/" +
-                "?size=500x500" +
-                "&margin=10" +
-                "&data=" +
-                encodeURIComponent(
-                    publicShopURL
-                );
 
+        <!-- ==============================
+             FACILITIES
+        =============================== -->
 
-            // Make QR clickable too
-            qrImage.style.cursor = "pointer";
+        <section class="shop-section">
 
-            qrImage.onclick = function () {
+            <div class="section-heading">
 
-                window.open(
-                    publicShopURL,
-                    "_blank"
-                );
-            };
+                <span>FACILITIES</span>
 
+                <h2>Available Facilities</h2>
 
-            console.log(
-                "QR URL:",
-                publicShopURL
-            );
-        }
+            </div>
 
 
-        // ==================================
-        // SHOP URL TEXT
-        // ==================================
+            <div
+                class="facility-list"
+                id="facilities"
+            >
 
-        const shopURL =
-            document.getElementById("shopURL");
+                <p>
+                    Loading facilities...
+                </p>
 
-        if (shopURL) {
+            </div>
 
-            const publicShopURL =
-                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
-                encodeURIComponent(shop.slug);
+        </section>
 
-            shopURL.textContent =
-                publicShopURL;
 
-            shopURL.href =
-                publicShopURL;
+        <!-- ==============================
+             SHOP PHOTOS
+        =============================== -->
 
-            shopURL.target = "_blank";
-        }
+        <section class="shop-section">
 
+            <div class="section-heading">
 
-    } catch (error) {
+                <span>GALLERY</span>
 
-        console.error(
-            "Shop loading error:",
-            error
-        );
+                <h2>Shop Photos</h2>
 
-        document.body.innerHTML =
-            "<h2>Unable to load shop</h2>" +
-            "<p>" +
-            error.message +
-            "</p>";
-    }
-}
+                <p>
+                    Take a look at our shop.
+                </p>
 
+            </div>
 
-loadShop();
+
+            <div
+                class="modern-gallery"
+                id="shopPhotos"
+            >
+
+                <p>
+                    Loading photos...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==============================
+             MENU PHOTOS
+        =============================== -->
+
+        <section class="shop-section">
+
+            <div class="section-heading">
+
+                <span>MENU</span>
+
+                <h2>Menu Card</h2>
+
+                <p>
+                    Check our menu.
+                </p>
+
+            </div>
+
+
+            <div
+                class="document-gallery"
+                id="menuPhotos"
+            >
+
+                <p>
+                    Loading menu...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==============================
+             VISITING CARD
+        =============================== -->
+
+        <section class="shop-section">
+
+            <div class="section-heading">
+
+                <span>CONTACT</span>
+
+                <h2>Visiting Card</h2>
+
+            </div>
+
+
+            <div
+                class="document-gallery"
+                id="visitingCard"
+            >
+
+                <p>
+                    Loading visiting card...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==============================
+             OTHER PHOTOS
+        =============================== -->
+
+        <section class="shop-section">
+
+            <div class="section-heading">
+
+                <span>MORE</span>
+
+                <h2>Other Photos</h2>
+
+            </div>
+
+
+            <div
+                class="modern-gallery"
+                id="otherPhotos"
+            >
+
+                <p>
+                    Loading...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==============================
+             QR CODE
+        =============================== -->
+
+        <section class="qr-section">
+
+            <div class="section-heading">
+
+                <span>SHARE</span>
+
+                <h2>Scan & Visit This Shop</h2>
+
+                <p>
+                    Scan this QR code with your phone
+                    to open this digital shop.
+                </p>
+
+            </div>
+
+
+            <div class="qr-box">
+
+                <img
+                    id="qrCode"
+                    src=""
+                    alt="Shop QR Code"
+                >
+
+            </div>
+
+
+            <p>
+                <strong>Shop Link</strong>
+            </p>
+
+
+            <p>
+
+                <a
+                    id="shopURL"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Loading shop link...
+                </a>
+
+            </p>
+
+        </section>
+
+
+        <!-- ==============================
+             FOOTER
+        =============================== -->
+
+        <footer>
+
+            <h3>
+                Shopy Easy
+            </h3>
+
+            <p>
+                Make Your Shop Digital
+            </p>
+
+            <p class="copyright">
+                © 2026 Shopy Easy.
+                All rights reserved.
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <!-- ==============================
+         SUPABASE
+    =============================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script
+        src="supabase.js"
+    ></script>
+
+    <script
+        src="shop.js"
+    ></script>
+
+</body>
+
+</html>
