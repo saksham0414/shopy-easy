@@ -221,84 +221,61 @@ async function loadShop() {
         // QR CODE
         // ==================================
 
-        const qrImage =
-            document.getElementById("qrCode");
-
-        if (qrImage) {
-
-            // FIXED PUBLIC URL
-            const publicShopURL =
-                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
-                encodeURIComponent(shop.slug);
-
-
-            // QR Server
-            qrImage.src =
-                "https://api.qrserver.com/v1/create-qr-code/" +
-                "?size=500x500" +
-                "&margin=10" +
-                "&data=" +
-                encodeURIComponent(
-                    publicShopURL
-                );
-
-
-            // Make QR clickable too
-            qrImage.style.cursor = "pointer";
-
-            qrImage.onclick = function () {
-
-                window.open(
-                    publicShopURL,
-                    "_blank"
-                );
-            };
-
-
-            console.log(
-                "QR URL:",
-                publicShopURL
-            );
-        }
-
-
         // ==================================
-        // SHOP URL TEXT
-        // ==================================
+// QR CODE
+// ==================================
 
-        const shopURL =
-            document.getElementById("shopURL");
+const qrImage =
+    document.getElementById("qrCode");
 
-        if (shopURL) {
+if (qrImage) {
 
-            const publicShopURL =
-                "https://saksham0414.github.io/shopy-easy/shop.html?shop=" +
-                encodeURIComponent(shop.slug);
+    const publicShopURL =
+        "https://shopy-easy-five.vercel.app/shop.html?shop=" +
+        encodeURIComponent(shop.slug);
 
-            shopURL.textContent =
-                publicShopURL;
+    qrImage.src =
+        "https://api.qrserver.com/v1/create-qr-code/" +
+        "?size=500x500" +
+        "&margin=10" +
+        "&data=" +
+        encodeURIComponent(publicShopURL);
 
-            shopURL.href =
-                publicShopURL;
+    qrImage.style.cursor = "pointer";
 
-            shopURL.target = "_blank";
-        }
+    qrImage.onclick = function () {
 
-
-    } catch (error) {
-
-        console.error(
-            "Shop loading error:",
-            error
+        window.open(
+            publicShopURL,
+            "_blank"
         );
+    };
 
-        document.body.innerHTML =
-            "<h2>Unable to load shop</h2>" +
-            "<p>" +
-            error.message +
-            "</p>";
-    }
+    console.log(
+        "QR URL:",
+        publicShopURL
+    );
 }
 
 
-loadShop();
+// ==================================
+// SHOP URL
+// ==================================
+
+const shopURL =
+    document.getElementById("shopURL");
+
+if (shopURL) {
+
+    const publicShopURL =
+        "https://shopy-easy-five.vercel.app/shop.html?shop=" +
+        encodeURIComponent(shop.slug);
+
+    shopURL.textContent =
+        publicShopURL;
+
+    shopURL.href =
+        publicShopURL;
+
+    shopURL.target = "_blank";
+}
