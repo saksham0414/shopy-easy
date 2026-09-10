@@ -2,322 +2,324 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Shop | Shopy Easy</title>
+    <title>
+        Digital Shop - Shopy Easy
+    </title>
 
-    <link rel="stylesheet"
-          href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body class="digital-shop">
 
-    <!-- ============================= -->
+
+<header class="navbar">
+
+    <div class="logo">
+        Shopy Easy
+    </div>
+
+    <a
+        href="index.html"
+        class="back-home"
+    >
+        ← Shopy Easy
+    </a>
+
+</header>
+
+
+
+<main class="shop-page">
+
+
     <!-- SHOP HEADER -->
-    <!-- ============================= -->
 
-    <header class="shop-hero">
+    <section class="shop-hero">
 
-        <div class="shop-hero-content">
+        <div
+            id="shopCategory"
+            class="shop-category"
+        >
+            Loading...
+        </div>
 
-            <div id="category"
-                 class="shop-category">
-                Shop
-            </div>
+        <h1 id="shopName">
+            Loading shop...
+        </h1>
 
-            <h1 id="shopName">
+        <p id="shopOwner">
+            Loading owner...
+        </p>
+
+    </section>
+
+
+
+    <!-- ERROR -->
+
+    <div
+        id="shopStatus"
+        class="empty-message"
+        style="display:none;"
+    ></div>
+
+
+
+    <!-- SHOP INFORMATION -->
+
+    <section class="shop-info">
+
+
+        <div class="info-card">
+
+            <strong>
+                📞 Mobile
+            </strong>
+
+            <p id="shopMobile">
                 Loading...
-            </h1>
-
-            <p>
-                Owner:
-                <strong id="ownerName">Loading...</strong>
             </p>
 
         </div>
 
-    </header>
 
 
-    <!-- ============================= -->
-    <!-- SHOP INFORMATION -->
-    <!-- ============================= -->
+        <div class="info-card">
 
-    <section class="shop-section">
+            <strong>
+                📍 Address
+            </strong>
 
-        <h2 class="section-heading">
-            Shop Information
-        </h2>
-
-        <div class="information-card">
-
-            <div class="info-item">
-
-                <div class="info-icon">
-                    📞
-                </div>
-
-                <div>
-                    <strong>Mobile</strong>
-                    <p id="mobile">Loading...</p>
-                </div>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <div class="info-icon">
-                    📍
-                </div>
-
-                <div>
-                    <strong>Address</strong>
-                    <p id="address">Loading...</p>
-                </div>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <div class="info-icon">
-                    🕒
-                </div>
-
-                <div>
-
-                    <strong>Opening Time</strong>
-
-                    <p id="openingTime">
-                        Loading...
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <div class="info-icon">
-                    🕒
-                </div>
-
-                <div>
-
-                    <strong>Closing Time</strong>
-
-                    <p id="closingTime">
-                        Loading...
-                    </p>
-
-                </div>
-
-            </div>
+            <p id="shopAddress">
+                Loading...
+            </p>
 
         </div>
 
 
-        <!-- CALL BUTTON -->
 
-        <a id="callButton"
-           class="primary-btn"
-           href="#">
+        <div class="info-card">
 
+            <strong>
+                🕒 Timing
+            </strong>
+
+            <p id="shopTiming">
+                Loading...
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- BUTTONS -->
+
+    <section class="shop-actions">
+
+        <a
+            id="callButton"
+            class="primary-btn"
+            href="#"
+            style="display:none;"
+        >
             📞 Call Shop
-
         </a>
 
 
-        <!-- MAP BUTTON -->
-
-        <a id="maps"
-           class="primary-btn maps-btn"
-           href="#"
-           target="_blank"
-           rel="noopener noreferrer">
-
-            📍 Open in Google Maps
-
+        <a
+            id="mapsButton"
+            class="secondary-btn"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display:none;"
+        >
+            📍 Open Google Maps
         </a>
 
     </section>
 
 
-    <!-- ============================= -->
+
     <!-- FACILITIES -->
-    <!-- ============================= -->
 
     <section class="shop-section">
 
-        <h2 class="section-heading">
+        <h2>
             Facilities
         </h2>
 
-        <div id="facilities"
-             class="facility-list">
-
-            <span>
-                Loading...
-            </span>
-
-        </div>
+        <div
+            id="facilitiesList"
+            class="facilities-list"
+        ></div>
 
     </section>
 
 
-    <!-- ============================= -->
+
     <!-- SHOP PHOTOS -->
-    <!-- ============================= -->
 
     <section class="shop-section">
 
-        <h2 class="section-heading">
+        <h2>
             Shop Photos
         </h2>
 
-        <div id="shopPhotos"
-             class="modern-gallery">
-
-        </div>
+        <div
+            id="shopPhotoGrid"
+            class="photo-grid"
+        ></div>
 
     </section>
 
 
-    <!-- ============================= -->
-    <!-- MENU PHOTOS -->
-    <!-- ============================= -->
+
+    <!-- MENU -->
 
     <section class="shop-section">
 
-        <h2 class="section-heading">
-            Menu / Products
+        <h2>
+            Menu
         </h2>
 
-        <div id="menuPhotos"
-             class="modern-gallery">
-
-        </div>
+        <div
+            id="menuPhotoGrid"
+            class="photo-grid"
+        ></div>
 
     </section>
 
 
-    <!-- ============================= -->
+
     <!-- VISITING CARD -->
-    <!-- ============================= -->
 
     <section class="shop-section">
 
-        <h2 class="section-heading">
+        <h2>
             Visiting Card
         </h2>
 
-        <div id="visitingCard"
-             class="document-gallery">
-
-        </div>
+        <div
+            id="visitingCardGrid"
+            class="photo-grid"
+        ></div>
 
     </section>
 
 
-    <!-- ============================= -->
+
     <!-- OTHER PHOTOS -->
-    <!-- ============================= -->
 
     <section class="shop-section">
 
-        <h2 class="section-heading">
+        <h2>
             Other Photos
         </h2>
 
-        <div id="otherPhotos"
-             class="modern-gallery">
-
-        </div>
+        <div
+            id="otherPhotoGrid"
+            class="photo-grid"
+        ></div>
 
     </section>
 
 
-    <!-- ============================= -->
+
     <!-- QR CODE -->
-    <!-- ============================= -->
 
-    <section class="shop-section qr-section">
+    <section class="qr-section">
 
-        <h2 class="section-heading">
-            Share This Shop
+        <h2>
+            Scan & Share
         </h2>
 
-        <div class="qr-box">
-
-            <img id="qrCode"
-                 src=""
-                 alt="Shop QR Code">
-
-            <p class="qr-note">
-                Scan this QR code to open this shop.
-            </p>
-
-        </div>
+        <p>
+            Scan this QR code to open this shop.
+        </p>
 
 
-        <!-- ============================= -->
-        <!-- VERCEL SHOP LINK -->
-        <!-- ============================= -->
+        <img
+            id="qrCode"
+            src=""
+            alt="Shop QR Code"
+            style="
+                display:block;
+                width:280px;
+                max-width:90%;
+                margin:20px auto;
+            "
+        >
 
-        <div style="
-            margin-top:20px;
-            text-align:center;
-            word-break:break-all;
-        ">
 
-            <strong>
-                Shop Website:
-            </strong>
-
-            <br>
-
-            <a id="shopURL"
-               href="#"
-               target="_blank"
-               rel="noopener noreferrer">
-
-                Loading shop link...
-
-            </a>
-
-        </div>
+        <a
+            id="shopURL"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="
+                display:block;
+                word-break:break-all;
+            "
+        >
+            Loading shop link...
+        </a>
 
     </section>
 
 
-    <!-- ============================= -->
-    <!-- FOOTER -->
-    <!-- ============================= -->
-
-    <footer class="copyright">
-
-        <p>
-            Powered by
-            <strong>Shopy Easy</strong>
-        </p>
-
-    </footer>
+</main>
 
 
-    <!-- ============================= -->
-    <!-- SCRIPTS -->
-    <!-- ============================= -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<footer>
 
-    <script src="supabase.js"></script>
+    <h3>
+        Shopy Easy
+    </h3>
 
-    <script src="shop.js"></script>
+    <p>
+        Simple digital tools for local shops.
+    </p>
+
+    <p class="copyright">
+        © 2026 Shopy Easy. All rights reserved.
+    </p>
+
+</footer>
+
+
+
+<!-- SCRIPTS -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+<script
+    src="supabase.js"
+></script>
+
+<script
+    src="shop.js"
+></script>
+
 
 </body>
 
