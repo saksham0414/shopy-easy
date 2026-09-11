@@ -2146,7 +2146,51 @@ form textarea:focus {
 
         width:
             calc(100% - 28px);
+/* ===== FULL IMAGE DISPLAY FIX ===== */
 
+/* Shop photos */
+#shopPhotoGrid img,
+#menuPhotoGrid img,
+#visitingCardGrid img,
+#otherPhotoGrid img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    display: block;
+}
+
+/* Image container */
+#shopPhotoGrid,
+#menuPhotoGrid,
+#visitingCardGrid,
+#otherPhotoGrid {
+    width: 100%;
+}
+
+/* Each image/card */
+#shopPhotoGrid > *,
+#menuPhotoGrid > *,
+#visitingCardGrid > *,
+#otherPhotoGrid > * {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* Photo cards */
+#shopPhotoGrid img,
+#menuPhotoGrid img,
+#visitingCardGrid img,
+#otherPhotoGrid img {
+    border-radius: 18px;
+}
+
+/* Keep gallery clean */
+.photo-grid {
+    height: auto !important;
+    overflow: visible !important;
+}
         margin-top: 60px;
     }
 
